@@ -1,0 +1,9 @@
+logging:
+  level:
+    com:
+      gonzalobalay: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
