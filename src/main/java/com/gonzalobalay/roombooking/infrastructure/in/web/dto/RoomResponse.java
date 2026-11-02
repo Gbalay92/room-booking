@@ -7,10 +7,7 @@ import java.util.UUID;
 
 public record RoomResponse(UUID id, String name, int capacity, Instant createdAt) {
 
-    public RoomResponse {
-
-    }
-
+    
     public static RoomResponse from(Room room) {
         return new RoomResponse(room.id(), room.name(), room.capacity(), room.createdAt());
     }
