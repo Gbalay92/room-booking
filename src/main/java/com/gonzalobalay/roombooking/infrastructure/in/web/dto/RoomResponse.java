@@ -5,7 +5,7 @@ import com.gonzalobalay.roombooking.domain.Room;
 import java.time.Instant;
 import java.util.UUID;
 
-public record RoomResponse(UUID id, String name, Integer capacity, Instant createdAt) {
+public record RoomResponse(UUID id, String name, int capacity, Instant createdAt) {
 
     public RoomResponse {
 
