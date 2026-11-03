@@ -3,6 +3,7 @@ package com.gonzalobalay.roombooking.application.service;
 import com.gonzalobalay.roombooking.application.config.BookingProperties;
 import com.gonzalobalay.roombooking.application.port.RoomRepository;
 import com.gonzalobalay.roombooking.domain.Room;
+import com.gonzalobalay.roombooking.domain.exception.RoomCapacityExceededException;
 import com.gonzalobalay.roombooking.domain.exception.RoomNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -42,15 +43,15 @@ public class RoomService {
     }
 
     public Room update(UUID id, String name, int capacity) {
-        checkCapacity(capacity);
         Room existingRoom = findById(id);
+        checkCapacity(capacity);
         Room updatedRoom = existingRoom.withDetails(name, capacity);
         return roomRepository.save(updatedRoom);
     }
 
     private void checkCapacity(int capacity) {
         if (capacity > bookingProperties.maxRoomCapacity()) {
-            throw new IllegalArgumentException("Room capacity cannot exceed " + bookingProperties.maxRoomCapacity());
+            throw new RoomCapacityExceededException(capacity, bookingProperties.maxRoomCapacity());
         }
     }
 

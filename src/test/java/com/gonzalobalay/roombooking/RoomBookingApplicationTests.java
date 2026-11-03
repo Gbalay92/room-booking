@@ -1,6 +1,7 @@
 package com.gonzalobalay.roombooking;
 
 import com.gonzalobalay.roombooking.application.service.RoomService;
+import com.gonzalobalay.roombooking.domain.exception.RoomCapacityExceededException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +30,7 @@ class RoomBookingApplicationTests {
 
     @Test
     void rejectsCapacityAboveTheTestProfileLimit() {
-        assertThrows(IllegalArgumentException.class, () -> roomService.create("Room 1", 49));
+        assertThrows(RoomCapacityExceededException.class, () -> roomService.create("Room 1", 49));
     }
 
 }
