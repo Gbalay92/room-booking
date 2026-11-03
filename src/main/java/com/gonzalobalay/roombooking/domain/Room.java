@@ -19,4 +19,8 @@ public record Room(UUID id, String name, int capacity, Instant createdAt) {
             throw new IllegalArgumentException("Room capacity must be greater than 0");
         }
     }
+
+    public Room withDetails(String name, int capacity) {
+        return new Room(this.id, name, capacity, this.createdAt);
+    }
 }

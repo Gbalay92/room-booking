@@ -4,6 +4,7 @@ import com.gonzalobalay.roombooking.application.service.RoomService;
 import com.gonzalobalay.roombooking.domain.Room;
 import com.gonzalobalay.roombooking.infrastructure.in.web.dto.CreateRoomRequest;
 import com.gonzalobalay.roombooking.infrastructure.in.web.dto.RoomResponse;
+import com.gonzalobalay.roombooking.infrastructure.in.web.dto.UpdateRoomRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -58,5 +60,11 @@ public class RoomController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteRoom(@PathVariable UUID id) {
         roomService.delete(id);
+    }
+
+    @PutMapping("/{id}")
+    public RoomResponse updateRoom(@PathVariable UUID id, @Valid @RequestBody UpdateRoomRequest request) {
+        Room room = roomService.update(id, request.name(), request.capacity());
+        return RoomResponse.from(room);
     }
 }

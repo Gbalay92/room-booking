@@ -25,9 +25,7 @@ public class RoomService {
     }
 
     public Room create(String name, int capacity) {
-        if (capacity > bookingProperties.maxRoomCapacity()) {
-            throw new IllegalArgumentException("Room capacity cannot exceed " + bookingProperties.maxRoomCapacity());
-        }
+        checkCapacity(capacity);
         return roomRepository.save(new Room(UUID.randomUUID(), name, capacity, Instant.now(clock)));
     }
 
@@ -41,6 +39,19 @@ public class RoomService {
 
     public void delete(UUID id) {
         roomRepository.deleteById(id);
+    }
+
+    public Room update(UUID id, String name, int capacity) {
+        checkCapacity(capacity);
+        Room existingRoom = findById(id);
+        Room updatedRoom = existingRoom.withDetails(name, capacity);
+        return roomRepository.save(updatedRoom);
+    }
+
+    private void checkCapacity(int capacity) {
+        if (capacity > bookingProperties.maxRoomCapacity()) {
+            throw new IllegalArgumentException("Room capacity cannot exceed " + bookingProperties.maxRoomCapacity());
+        }
     }
 
 }
