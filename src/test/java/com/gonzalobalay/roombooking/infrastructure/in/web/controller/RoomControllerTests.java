@@ -78,4 +78,34 @@ public class RoomControllerTests {
         then(roomService).shouldHaveNoInteractions();
 
     }
+
+    @Test
+    void returns400WithFieldErrorsWhenNameIsOverSizeLimit() {
+        String longName = "a".repeat(51);
+        assertThat(mvc.post().uri("/api/rooms").contentType(MediaType.APPLICATION_JSON)
+                .content(String.format("""
+                { "name": "%s", "capacity": 8 }
+                """, longName)))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("$.errors[0].field")
+                .isEqualTo("name");
+        then(roomService).shouldHaveNoInteractions();
+
+    }
+
+    @Test
+    void returns400WithFieldErrorsWhenNameIsOverSizeLimitPut() {
+        String longName = "a".repeat(51);
+        assertThat(mvc.put().uri("/api/rooms/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON)
+                .content(String.format("""
+                { "name": "%s", "capacity": 8 }
+                """, longName)))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("$.errors[0].field")
+                .isEqualTo("name");
+        then(roomService).shouldHaveNoInteractions();
+
+    }
 }
