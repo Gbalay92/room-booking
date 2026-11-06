@@ -3,6 +3,10 @@ spring:
     name: room-booking
   profiles:
     default: dev
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
 server:
   port: 8080
 management:
@@ -10,6 +14,7 @@ management:
     web:
       exposure:
         include: health,info
+
 booking:
   opening-time: "08:00"
   closing-time: "20:00"
