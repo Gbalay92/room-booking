@@ -41,13 +41,10 @@ public class BookingPersistenceAdapter implements BookingRepository {
     }
 
     @Override
-    public List<BookingSummary> findAllSummaries() {
-        return jpaBookingRepository.findAll().stream().map(bookingMapper::toSummary).toList();
-    }
-
-    @Override
     public PageResult<BookingSummary> findAll(int page, int size) {
-        Page<BookingJpaEntity> pageResult = jpaBookingRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "startsAt")));
-        return new PageResult<>(pageResult.getContent().stream().map(bookingMapper::toSummary).toList(), page, size, pageResult.getTotalElements());
+        Page<BookingJpaEntity> pageResult = jpaBookingRepository.findAll(
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "startsAt").and(Sort.by("id"))));
+        return new PageResult<>(pageResult.getContent().stream().map(
+                bookingMapper::toSummary).toList(), page, size, pageResult.getTotalElements());
     }
 }

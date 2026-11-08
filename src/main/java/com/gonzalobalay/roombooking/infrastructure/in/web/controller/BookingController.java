@@ -22,10 +22,6 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
-//    @GetMapping
-//    public List<BookingResponse> getBookingSummaries() {
-//        return bookingService.findAllBookingSummaries().stream().map(BookingResponse::from).toList();
-//    }
 
     @GetMapping()
     public PageResult<BookingResponse> getBookingSummaries(@RequestParam(defaultValue = "0") @Min(0) int page, @Min(1) @Max(100) @RequestParam(defaultValue = "20") int size) {

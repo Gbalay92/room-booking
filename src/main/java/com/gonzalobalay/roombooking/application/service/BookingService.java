@@ -6,7 +6,6 @@ import com.gonzalobalay.roombooking.application.port.PageResult;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class BookingService {
@@ -15,11 +14,6 @@ public class BookingService {
 
     public BookingService(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;
-    }
-
-    @Transactional(readOnly = true)
-    public List<BookingSummary> findAllBookingSummaries() {
-        return bookingRepository.findAllSummaries();
     }
 
     @Transactional(readOnly = true)
