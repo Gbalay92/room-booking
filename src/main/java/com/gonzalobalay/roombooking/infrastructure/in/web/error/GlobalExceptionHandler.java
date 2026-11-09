@@ -1,5 +1,7 @@
 package com.gonzalobalay.roombooking.infrastructure.in.web.error;
 
+import com.gonzalobalay.roombooking.domain.exception.BookingNotFoundException;
+import com.gonzalobalay.roombooking.domain.exception.BookingOverlapException;
 import com.gonzalobalay.roombooking.domain.exception.RoomCapacityExceededException;
 import com.gonzalobalay.roombooking.domain.exception.RoomNotFoundException;
 import com.gonzalobalay.roombooking.infrastructure.in.web.dto.FieldErrorDetail;
@@ -32,6 +34,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleRoomCapacityExceeded(RoomCapacityExceededException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, e.getMessage());
         problemDetail.setTitle("Room capacity exceeded");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(BookingOverlapException.class)
+    public ProblemDetail handleBookingOverlapException(BookingOverlapException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+        problemDetail.setTitle("Booking overlap");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(BookingNotFoundException.class)
+    public ProblemDetail handleBookingNotFoundException(BookingNotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+        problemDetail.setTitle("Booking not found");
         return problemDetail;
     }
 

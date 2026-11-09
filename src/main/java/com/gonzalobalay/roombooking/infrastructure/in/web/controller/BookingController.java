@@ -4,12 +4,16 @@ import com.gonzalobalay.roombooking.application.port.BookingSummary;
 import com.gonzalobalay.roombooking.application.port.PageResult;
 import com.gonzalobalay.roombooking.application.service.BookingService;
 import com.gonzalobalay.roombooking.infrastructure.in.web.dto.BookingResponse;
+import com.gonzalobalay.roombooking.infrastructure.in.web.dto.CreateBookingRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.UUID;
 
 
 @RestController
@@ -28,5 +32,22 @@ public class BookingController {
         PageResult<BookingSummary> bookingSummaries = bookingService.findAllBookingSummaries(page, size);
         return new PageResult<>(bookingSummaries.content().stream().map(BookingResponse::from).toList(),
                 bookingSummaries.page(), bookingSummaries.size(), bookingSummaries.totalElements());
+    }
+
+    @GetMapping("/{id}")
+    public BookingResponse getBookingSummary(@PathVariable UUID id) {
+        BookingSummary bookingSummary = bookingService.findSummaryById(id);
+        return BookingResponse.from(bookingSummary);
+    }
+
+    @PostMapping
+    public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody CreateBookingRequest bookingRequest) {
+        BookingSummary bookingSummary = bookingService.createBooking(bookingRequest.roomId(), bookingRequest.startsAt(), bookingRequest.endsAt(), bookingRequest.userName());
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(bookingSummary.id())
+                .toUri();
+
+        return ResponseEntity.created(location).body(BookingResponse.from(bookingSummary));
     }
 }

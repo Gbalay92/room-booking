@@ -9,7 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,10 +41,21 @@ public class BookingPersistenceAdapter implements BookingRepository {
     }
 
     @Override
+    public Optional<BookingSummary> findSummaryById(UUID id) {
+        return jpaBookingRepository.findById(id).map(bookingMapper::toSummary);
+    }
+
+    @Override
     public PageResult<BookingSummary> findAll(int page, int size) {
         Page<BookingJpaEntity> pageResult = jpaBookingRepository.findAll(
                 PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "startsAt").and(Sort.by("id"))));
         return new PageResult<>(pageResult.getContent().stream().map(
                 bookingMapper::toSummary).toList(), page, size, pageResult.getTotalElements());
+    }
+
+
+    @Override
+    public boolean existsOverlapping(UUID roomId, Instant startsAt, Instant endsAt) {
+        return jpaBookingRepository.existsOverlapping(roomId, startsAt, endsAt);
     }
 }
