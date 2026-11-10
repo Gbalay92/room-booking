@@ -1,7 +1,6 @@
 package com.gonzalobalay.roombooking.application.service;
 
 import com.gonzalobalay.roombooking.application.port.BookingSummary;
-import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
