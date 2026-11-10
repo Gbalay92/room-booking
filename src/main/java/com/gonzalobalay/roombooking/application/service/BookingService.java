@@ -9,8 +9,10 @@ import com.gonzalobalay.roombooking.domain.Room;
 import com.gonzalobalay.roombooking.domain.exception.BookingNotFoundException;
 import com.gonzalobalay.roombooking.domain.exception.BookingOverlapException;
 import com.gonzalobalay.roombooking.domain.exception.RoomNotFoundException;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -42,16 +44,28 @@ public class BookingService {
         return bookingRepository.findAll(page, size);
     }
 
-    @Transactional
     public BookingSummary createBooking(UUID roomId, Instant startsAt, Instant endsAt, String userName) {
-        Room room = roomRepository.findById(roomId).orElseThrow(() -> new RoomNotFoundException(roomId));
+        int attempts = 0;
+        while (true) {
+            try {
+                return createBookingOnce(roomId, startsAt, endsAt, userName);
+            } catch (CannotAcquireLockException e) {
+                if (++attempts >= 3) throw e;
+            }
+        }
+    }
+
+    @Transactional
+    public BookingSummary createBookingOnce(UUID roomId, Instant startsAt, Instant endsAt, String   userName) {
+        System.out.println("TX activa? " + TransactionSynchronizationManager.isActualTransactionActive());
+        Room room = roomRepository.findByIdForUpdate(roomId).orElseThrow(() -> new RoomNotFoundException(roomId));
         if (bookingRepository.existsOverlapping(roomId, startsAt, endsAt)) {
             throw new BookingOverlapException(roomId);
         }
         Booking saved = bookingRepository.save(
-                new Booking(UUID.randomUUID(), roomId, startsAt, endsAt, userName));   // 3
+                new Booking(UUID.randomUUID(), roomId, startsAt, endsAt, userName));
 
-        return new BookingSummary(saved.id(), saved.roomId(), room.name(),     // 4
+        return new BookingSummary(saved.id(), saved.roomId(), room.name(),
                 saved.startsAt(), saved.endsAt(), saved.userName());
     }
 }

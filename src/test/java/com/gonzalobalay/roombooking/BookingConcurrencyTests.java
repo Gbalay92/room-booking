@@ -1,6 +1,7 @@
 package com.gonzalobalay.roombooking;
 
 import com.gonzalobalay.roombooking.application.service.BookingService;
+import com.gonzalobalay.roombooking.application.service.RetryingBookingService;
 import com.gonzalobalay.roombooking.application.service.RoomService;
 import com.gonzalobalay.roombooking.domain.exception.BookingOverlapException;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,9 @@ public class BookingConcurrencyTests {
     private BookingService bookingService;
 
     @Autowired
+    private RetryingBookingService retryingBookingService;
+
+    @Autowired
     private RoomService roomService;
 
     @Test
@@ -47,7 +51,7 @@ public class BookingConcurrencyTests {
                 ready.countDown();
                 go.await();
                 try {
-                    bookingService.createBooking(roomId, start, end, "user");
+                    retryingBookingService.createBooking(roomId, start, end, "user");
                     successes.incrementAndGet();
                 } catch (BookingOverlapException e) {
                     conflicts.incrementAndGet();

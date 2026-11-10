@@ -11,4 +11,5 @@ public interface RoomRepository {
     Optional<Room> findById(UUID id);
     void deleteById(UUID id);
     List<Room> findAll();
+    Optional<Room> findByIdForUpdate(UUID id);
 }

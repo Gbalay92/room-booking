@@ -34,7 +34,7 @@ public class BookingPersistenceAdapter implements BookingRepository {
             return bookingMapper.toDomainEntity(saved);
         } catch (DataIntegrityViolationException e) {
             if (e.getCause() instanceof ConstraintViolationException cve
-                    && "booking_no_overlap".equals(cve.getConstraintName())) {
+                    && "23P01".equalsIgnoreCase(cve.getSQLState())) { // 23P01 = booking_no_overlap Restriction
                 throw new BookingOverlapException(booking.roomId());
             }
             throw e;
@@ -64,9 +64,9 @@ public class BookingPersistenceAdapter implements BookingRepository {
                 bookingMapper::toSummary).toList(), page, size, pageResult.getTotalElements());
     }
 
-
     @Override
     public boolean existsOverlapping(UUID roomId, Instant startsAt, Instant endsAt) {
         return jpaBookingRepository.existsOverlapping(roomId, startsAt, endsAt);
     }
+
 }

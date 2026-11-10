@@ -40,4 +40,9 @@ public class RoomPersistenceAdapter implements RoomRepository {
         return jpaRoomRepository.findAll().stream().map(roomMapper::toDomain).toList();
     }
 
+    @Override
+    public Optional<Room> findByIdForUpdate(UUID id) {
+        return jpaRoomRepository.findByIdForUpdate(id).map(roomMapper::toDomain);
+    }
+
 }

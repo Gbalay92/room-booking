@@ -3,6 +3,7 @@ package com.gonzalobalay.roombooking.infrastructure.in.web.controller;
 import com.gonzalobalay.roombooking.application.port.BookingSummary;
 import com.gonzalobalay.roombooking.application.port.PageResult;
 import com.gonzalobalay.roombooking.application.service.BookingService;
+import com.gonzalobalay.roombooking.application.service.RetryingBookingService;
 import com.gonzalobalay.roombooking.infrastructure.in.web.dto.BookingResponse;
 import com.gonzalobalay.roombooking.infrastructure.in.web.dto.CreateBookingRequest;
 import jakarta.validation.Valid;
@@ -21,9 +22,11 @@ import java.util.UUID;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final RetryingBookingService retryingBookingService;
 
-    public BookingController(BookingService bookingService) {
+    public BookingController(BookingService bookingService, RetryingBookingService retryingBookingService) {
         this.bookingService = bookingService;
+        this.retryingBookingService = retryingBookingService;
     }
 
 
@@ -42,7 +45,7 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody CreateBookingRequest bookingRequest) {
-        BookingSummary bookingSummary = bookingService.createBooking(bookingRequest.roomId(), bookingRequest.startsAt(), bookingRequest.endsAt(), bookingRequest.userName());
+        BookingSummary bookingSummary = retryingBookingService.createBooking(bookingRequest.roomId(), bookingRequest.startsAt(), bookingRequest.endsAt(), bookingRequest.userName());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(bookingSummary.id())
