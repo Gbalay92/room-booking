@@ -4,6 +4,9 @@ import com.gonzalobalay.roombooking.application.port.BookingRepository;
 import com.gonzalobalay.roombooking.application.port.BookingSummary;
 import com.gonzalobalay.roombooking.application.port.PageResult;
 import com.gonzalobalay.roombooking.domain.Booking;
+import com.gonzalobalay.roombooking.domain.exception.BookingOverlapException;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -26,8 +29,16 @@ public class BookingPersistenceAdapter implements BookingRepository {
 
     @Override
     public Booking save(Booking booking) {
-        BookingJpaEntity saved = jpaBookingRepository.save(bookingMapper.toJpaEntity(booking));
-        return bookingMapper.toDomainEntity(saved);
+        try {
+            BookingJpaEntity saved = jpaBookingRepository.saveAndFlush(bookingMapper.toJpaEntity(booking));
+            return bookingMapper.toDomainEntity(saved);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getCause() instanceof ConstraintViolationException cve
+                    && "booking_no_overlap".equals(cve.getConstraintName())) {
+                throw new BookingOverlapException(booking.roomId());
+            }
+            throw e;
+        }
     }
 
     @Override
