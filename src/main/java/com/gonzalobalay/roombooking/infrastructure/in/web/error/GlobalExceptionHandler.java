@@ -1,9 +1,6 @@
 package com.gonzalobalay.roombooking.infrastructure.in.web.error;
 
-import com.gonzalobalay.roombooking.domain.exception.BookingNotFoundException;
-import com.gonzalobalay.roombooking.domain.exception.BookingOverlapException;
-import com.gonzalobalay.roombooking.domain.exception.RoomCapacityExceededException;
-import com.gonzalobalay.roombooking.domain.exception.RoomNotFoundException;
+import com.gonzalobalay.roombooking.domain.exception.*;
 import com.gonzalobalay.roombooking.infrastructure.in.web.dto.FieldErrorDetail;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpHeaders;
@@ -48,6 +45,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleBookingNotFoundException(BookingNotFoundException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
         problemDetail.setTitle("Booking not found");
+        return problemDetail;
+    }
+
+
+    @ExceptionHandler(RoomConcurrentModificationException.class)
+    public ProblemDetail handleRoomConcurrentModificationException(RoomConcurrentModificationException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+        problemDetail.setTitle("Room has been modified");
         return problemDetail;
     }
 

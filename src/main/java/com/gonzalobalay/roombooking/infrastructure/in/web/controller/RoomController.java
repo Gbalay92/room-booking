@@ -64,7 +64,7 @@ public class RoomController {
 
     @PutMapping("/{id}")
     public RoomResponse updateRoom(@PathVariable UUID id, @Valid @RequestBody UpdateRoomRequest request) {
-        Room room = roomService.update(id, request.name(), request.capacity());
+        Room room = roomService.update(id, request.name(), request.capacity(), request.version());
         return RoomResponse.from(room);
     }
 }

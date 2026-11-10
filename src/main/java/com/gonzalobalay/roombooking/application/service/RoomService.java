@@ -27,7 +27,7 @@ public class RoomService {
 
     public Room create(String name, int capacity) {
         checkCapacity(capacity);
-        return roomRepository.save(new Room(UUID.randomUUID(), name, capacity, Instant.now(clock)));
+        return roomRepository.save(new Room(UUID.randomUUID(), name, capacity, Instant.now(clock), null));
     }
 
     public Room findById(UUID id) {
@@ -42,10 +42,10 @@ public class RoomService {
         roomRepository.deleteById(id);
     }
 
-    public Room update(UUID id, String name, int capacity) {
+    public Room update(UUID id, String name, int capacity, Long version) {
         Room existingRoom = findById(id);
         checkCapacity(capacity);
-        Room updatedRoom = existingRoom.withDetails(name, capacity);
+        Room updatedRoom = existingRoom.withDetails(name, capacity, version);
         return roomRepository.save(updatedRoom);
     }
 

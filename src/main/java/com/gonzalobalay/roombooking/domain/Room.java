@@ -3,7 +3,7 @@ package com.gonzalobalay.roombooking.domain;
 import java.time.Instant;
 import java.util.UUID;
 
-public record Room(UUID id, String name, int capacity, Instant createdAt) {
+public record Room(UUID id, String name, int capacity, Instant createdAt, Long version) {
 
     public Room {
         if (id == null) {
@@ -20,7 +20,7 @@ public record Room(UUID id, String name, int capacity, Instant createdAt) {
         }
     }
 
-    public Room withDetails(String name, int capacity) {
-        return new Room(this.id, name, capacity, this.createdAt);
+    public Room withDetails(String name, int capacity, Long version) {
+        return new Room(this.id, name, capacity, this.createdAt, version);
     }
 }

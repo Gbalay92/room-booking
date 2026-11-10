@@ -55,7 +55,7 @@ public class RoomControllerTests {
 
     @Test
     void createsRoomAndReturns201WithLocation() {
-        Room room = new Room(UUID.randomUUID(), "Test Room", 8, Clock.systemUTC().instant());
+        Room room = new Room(UUID.randomUUID(), "Test Room", 8, Clock.systemUTC().instant(), null);
         given(roomService.create("Test Room", 8)).willReturn(room);
         assertThat(mvc.post().uri("/api/rooms").contentType(MediaType.APPLICATION_JSON)
                 .content("""
@@ -69,7 +69,7 @@ public class RoomControllerTests {
     void returns400WithFieldErrorsWhenNameIsBlank() {
         assertThat(mvc.post().uri("/api/rooms").contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                { "name": "", "capacity": 8 }
+                { "name": "", "capacity": 8, "version": 0}
                 """))
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()
@@ -99,7 +99,7 @@ public class RoomControllerTests {
         String longName = "a".repeat(51);
         assertThat(mvc.put().uri("/api/rooms/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON)
                 .content(String.format("""
-                { "name": "%s", "capacity": 8 }
+                { "name": "%s", "capacity": 8, "version": 0}
                 """, longName)))
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyJson()

@@ -2,6 +2,8 @@ package com.gonzalobalay.roombooking.infrastructure.out.persistence;
 
 import com.gonzalobalay.roombooking.application.port.RoomRepository;
 import com.gonzalobalay.roombooking.domain.Room;
+import com.gonzalobalay.roombooking.domain.exception.RoomConcurrentModificationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,8 +23,12 @@ public class RoomPersistenceAdapter implements RoomRepository {
 
     @Override
     public Room save(Room room) {
-        RoomJpaEntity saved = jpaRoomRepository.save(roomMapper.toJpaEntity(room));
-        return roomMapper.toDomain(saved);
+        try {
+            RoomJpaEntity saved = jpaRoomRepository.saveAndFlush(roomMapper.toJpaEntity(room));
+            return roomMapper.toDomain(saved);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            throw new RoomConcurrentModificationException(room.version());
+        }
     }
 
     @Override

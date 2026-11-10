@@ -1,15 +1,16 @@
 package com.gonzalobalay.roombooking.infrastructure.in.web.dto;
 
 import com.gonzalobalay.roombooking.domain.Room;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public record RoomResponse(UUID id, String name, int capacity, Instant createdAt) {
+public record RoomResponse(UUID id, String name, int capacity, Instant createdAt, Long version) {
 
     
     public static RoomResponse from(Room room) {
-        return new RoomResponse(room.id(), room.name(), room.capacity(), room.createdAt());
+        return new RoomResponse(room.id(), room.name(), room.capacity(), room.createdAt(), room.version());
     }
 
 }

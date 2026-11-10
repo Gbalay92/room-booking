@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 class RoomMapper {
 
     Room toDomain(RoomJpaEntity entity) {
-        return new Room(entity.getId(), entity.getName(), entity.getCapacity(), entity.getCreatedAt());
+        return new Room(entity.getId(), entity.getName(), entity.getCapacity(), entity.getCreatedAt(), entity.getVersion());
     }
 
     RoomJpaEntity toJpaEntity(Room domain) {
-        return new RoomJpaEntity(domain.id(), domain.name(), domain.capacity(), domain.createdAt());
+        return new RoomJpaEntity(domain.id(), domain.name(), domain.capacity(), domain.createdAt(), domain.version());
     }
 
 }

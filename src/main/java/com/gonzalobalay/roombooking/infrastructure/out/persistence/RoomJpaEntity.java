@@ -3,6 +3,7 @@ package com.gonzalobalay.roombooking.infrastructure.out.persistence;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -17,15 +18,18 @@ public class RoomJpaEntity {
     private String name;
     private int capacity;
     private Instant createdAt;
+    @Version
+    private Long version;
 
     protected RoomJpaEntity() {
     }
 
-    public RoomJpaEntity(UUID id, String name, int capacity, Instant createdAt) {
+    public RoomJpaEntity(UUID id, String name, int capacity, Instant createdAt, Long version) {
         this.id = id;
         this.name = name;
         this.capacity = capacity;
         this.createdAt = createdAt;
+        this.version = version;
     }
 
     public UUID getId() {
@@ -42,5 +46,9 @@ public class RoomJpaEntity {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public Long getVersion() {
+        return version;
     }
 }
