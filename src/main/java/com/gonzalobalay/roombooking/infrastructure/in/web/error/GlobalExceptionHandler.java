@@ -48,11 +48,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
-
     @ExceptionHandler(RoomConcurrentModificationException.class)
     public ProblemDetail handleRoomConcurrentModificationException(RoomConcurrentModificationException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
         problemDetail.setTitle("Room has been modified");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(InvalidTimeRangeException.class)
+    public ProblemDetail handleInvalidTimeRangeException(InvalidTimeRangeException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+        problemDetail.setTitle("Invalid time range");
         return problemDetail;
     }
 

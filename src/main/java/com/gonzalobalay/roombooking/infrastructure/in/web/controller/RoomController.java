@@ -1,25 +1,20 @@
 package com.gonzalobalay.roombooking.infrastructure.in.web.controller;
 
+import com.gonzalobalay.roombooking.application.port.AvailableRoom;
 import com.gonzalobalay.roombooking.application.service.RoomService;
 import com.gonzalobalay.roombooking.domain.Room;
 import com.gonzalobalay.roombooking.infrastructure.in.web.dto.CreateRoomRequest;
 import com.gonzalobalay.roombooking.infrastructure.in.web.dto.RoomResponse;
 import com.gonzalobalay.roombooking.infrastructure.in.web.dto.UpdateRoomRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -66,5 +61,10 @@ public class RoomController {
     public RoomResponse updateRoom(@PathVariable UUID id, @Valid @RequestBody UpdateRoomRequest request) {
         Room room = roomService.update(id, request.name(), request.capacity(), request.version());
         return RoomResponse.from(room);
+    }
+
+    @GetMapping("/available")
+    public List<AvailableRoom> findAvailableRooms(@Min(1) @RequestParam(defaultValue = "1") int minCapacity, @RequestParam Instant startsAt, @RequestParam Instant endsAt) {
+        return roomService.findAvailableRooms(minCapacity, startsAt, endsAt);
     }
 }

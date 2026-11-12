@@ -1,11 +1,13 @@
 package com.gonzalobalay.roombooking.infrastructure.out.persistence;
 
+import com.gonzalobalay.roombooking.application.port.AvailableRoom;
 import com.gonzalobalay.roombooking.application.port.RoomRepository;
 import com.gonzalobalay.roombooking.domain.Room;
 import com.gonzalobalay.roombooking.domain.exception.RoomConcurrentModificationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,6 +51,11 @@ public class RoomPersistenceAdapter implements RoomRepository {
     @Override
     public Optional<Room> findByIdForUpdate(UUID id) {
         return jpaRoomRepository.findByIdForUpdate(id).map(roomMapper::toDomain);
+    }
+
+    @Override
+    public List<AvailableRoom> findAvailableRooms(int minCapacity, Instant startsAt, Instant endsAt) {
+        return jpaRoomRepository.findAvailableRooms(minCapacity, startsAt, endsAt);
     }
 
 }

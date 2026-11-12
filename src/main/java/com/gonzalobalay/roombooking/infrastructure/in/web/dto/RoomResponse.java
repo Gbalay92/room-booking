@@ -1,7 +1,6 @@
 package com.gonzalobalay.roombooking.infrastructure.in.web.dto;
 
 import com.gonzalobalay.roombooking.domain.Room;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 import java.util.UUID;

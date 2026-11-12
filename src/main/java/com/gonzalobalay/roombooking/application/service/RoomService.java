@@ -1,11 +1,14 @@
 package com.gonzalobalay.roombooking.application.service;
 
 import com.gonzalobalay.roombooking.application.config.BookingProperties;
+import com.gonzalobalay.roombooking.application.port.AvailableRoom;
 import com.gonzalobalay.roombooking.application.port.RoomRepository;
 import com.gonzalobalay.roombooking.domain.Room;
+import com.gonzalobalay.roombooking.domain.exception.InvalidTimeRangeException;
 import com.gonzalobalay.roombooking.domain.exception.RoomCapacityExceededException;
 import com.gonzalobalay.roombooking.domain.exception.RoomNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -53,6 +56,14 @@ public class RoomService {
         if (capacity > bookingProperties.maxRoomCapacity()) {
             throw new RoomCapacityExceededException(capacity, bookingProperties.maxRoomCapacity());
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<AvailableRoom> findAvailableRooms(int minCapacity, Instant startsAt, Instant endsAt) {
+        if (!endsAt.isAfter(startsAt)) {
+            throw new InvalidTimeRangeException(startsAt, endsAt);
+        }
+        return roomRepository.findAvailableRooms(minCapacity, startsAt, endsAt);
     }
 
 }
