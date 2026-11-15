@@ -55,7 +55,7 @@ public class RoomPersistenceAdapter implements RoomRepository {
 
     @Override
     public List<AvailableRoom> findAvailableRooms(int minCapacity, Instant startsAt, Instant endsAt) {
-        return jpaRoomRepository.findAvailableRooms(minCapacity, startsAt, endsAt);
+        return jpaRoomRepository.findAvailableRoomsNative(minCapacity, startsAt, endsAt);
     }
 
 }
