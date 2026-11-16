@@ -4,11 +4,15 @@ import com.gonzalobalay.roombooking.application.service.RoomService;
 import com.gonzalobalay.roombooking.domain.Room;
 import com.gonzalobalay.roombooking.domain.exception.RoomCapacityExceededException;
 import com.gonzalobalay.roombooking.domain.exception.RoomNotFoundException;
+import com.gonzalobalay.roombooking.infrastructure.config.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
@@ -20,6 +24,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 @WebMvcTest(RoomController.class)
+@Import(SecurityConfig.class)
+@WithMockUser
 public class RoomControllerTests {
 
     @Autowired
@@ -107,5 +113,13 @@ public class RoomControllerTests {
                 .isEqualTo("name");
         then(roomService).shouldHaveNoInteractions();
 
+    }
+
+    @Test
+    @WithAnonymousUser
+    void returns401WhenNotAuthenticated() {
+        assertThat(mvc.get().uri("/api/rooms/{id}", UUID.randomUUID()))
+                .hasStatus(HttpStatus.UNAUTHORIZED);
+        then(roomService).shouldHaveNoInteractions();
     }
 }
