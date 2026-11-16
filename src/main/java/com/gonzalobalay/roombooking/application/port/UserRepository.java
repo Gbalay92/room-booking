@@ -1,7 +1,6 @@
 package com.gonzalobalay.roombooking.application.port;
 
 import com.gonzalobalay.roombooking.domain.User;
-import com.gonzalobalay.roombooking.infrastructure.out.persistence.UserJpaEntity;
 
 import java.util.Optional;
 

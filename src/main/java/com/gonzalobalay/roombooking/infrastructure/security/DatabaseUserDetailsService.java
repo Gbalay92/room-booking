@@ -19,7 +19,7 @@ class DatabaseUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("..."));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.email())
                 .password(user.passwordHash())
