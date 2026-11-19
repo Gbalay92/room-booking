@@ -9,6 +9,7 @@ import com.gonzalobalay.roombooking.domain.Room;
 import com.gonzalobalay.roombooking.domain.exception.BookingNotFoundException;
 import com.gonzalobalay.roombooking.domain.exception.BookingOverlapException;
 import com.gonzalobalay.roombooking.domain.exception.RoomNotFoundException;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -41,13 +42,20 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
+    @PostAuthorize("hasRole('ADMIN') or returnObject.userName() == authentication.name")
     public BookingSummary findSummaryById(UUID id) {
         return bookingRepository.findSummaryById(id).orElseThrow(() -> new BookingNotFoundException(id));
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN')")
     public PageResult<BookingSummary> findAllBookingSummaries(int page, int size) {
         return bookingRepository.findAll(page, size);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResult<BookingSummary> findBookingSummariesByUser(String userName, int page, int size) {
+        return bookingRepository.findAllByUserName(userName, page, size);
     }
 
 

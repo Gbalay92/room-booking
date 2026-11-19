@@ -13,4 +13,5 @@ public interface BookingRepository {
     Optional<BookingSummary> findSummaryById(UUID id);
     PageResult<BookingSummary> findAll(int page, int size);
     boolean existsOverlapping(UUID roomId, Instant startsAt, Instant endsAt);
+    PageResult<BookingSummary> findAllByUserName(String userName, int page, int size);
 }

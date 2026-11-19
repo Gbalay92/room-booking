@@ -32,9 +32,18 @@ public class BookingController {
     }
 
 
+
     @GetMapping()
-    public PageResult<BookingResponse> getBookingSummaries(@RequestParam(defaultValue = "0") @Min(0) int page, @Min(1) @Max(100) @RequestParam(defaultValue = "20") int size) {
-        PageResult<BookingSummary> bookingSummaries = bookingService.findAllBookingSummaries(page, size);
+    public PageResult<BookingResponse> getBookingSummaries(@RequestParam(defaultValue = "0") @Min(0) int page,
+                                                           @Min(1) @Max(100) @RequestParam(defaultValue = "20") int size,
+                                                           Authentication authentication) {
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+        PageResult<BookingSummary> bookingSummaries = isAdmin
+                ? bookingService.findAllBookingSummaries(page, size)
+                : bookingService.findBookingSummariesByUser(authentication.getName(), page, size);
+
         return new PageResult<>(bookingSummaries.content().stream().map(BookingResponse::from).toList(),
                 bookingSummaries.page(), bookingSummaries.size(), bookingSummaries.totalElements());
     }

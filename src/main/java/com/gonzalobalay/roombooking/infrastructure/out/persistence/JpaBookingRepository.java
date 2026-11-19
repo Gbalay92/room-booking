@@ -24,4 +24,7 @@ public interface JpaBookingRepository extends JpaRepository<BookingJpaEntity, UU
        """)
     boolean existsOverlapping(UUID roomId, Instant startsAt, Instant endsAt);
 
+    @EntityGraph(attributePaths = "room")
+    Page<BookingJpaEntity> findByUserName(String userName, Pageable pageable);
+
 }

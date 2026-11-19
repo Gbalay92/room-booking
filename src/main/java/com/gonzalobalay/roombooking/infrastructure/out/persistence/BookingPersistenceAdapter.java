@@ -69,4 +69,12 @@ public class BookingPersistenceAdapter implements BookingRepository {
         return jpaBookingRepository.existsOverlapping(roomId, startsAt, endsAt);
     }
 
+    @Override
+    public PageResult<BookingSummary> findAllByUserName(String userName, int page, int size) {
+        Page<BookingJpaEntity> pageResult = jpaBookingRepository.findByUserName(userName,
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "startsAt").and(Sort.by("id"))));
+        return new PageResult<>(pageResult.getContent().stream().map(bookingMapper::toSummary).toList(),
+                page, size, pageResult.getTotalElements());
+    }
+
 }

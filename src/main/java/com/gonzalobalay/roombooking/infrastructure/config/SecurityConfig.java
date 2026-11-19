@@ -1,5 +1,8 @@
 package com.gonzalobalay.roombooking.infrastructure.config;
 
+import com.gonzalobalay.roombooking.infrastructure.security.ProblemDetailAccessDeniedHandler;
+import com.gonzalobalay.roombooking.infrastructure.security.ProblemDetailAuthenticationEntryPoint;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 @EnableWebSecurity
@@ -19,7 +23,10 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver) throws Exception {
+        ProblemDetailAuthenticationEntryPoint authenticationEntryPoint = new ProblemDetailAuthenticationEntryPoint(handlerExceptionResolver);
+        ProblemDetailAccessDeniedHandler accessDeniedHandler = new ProblemDetailAccessDeniedHandler(handlerExceptionResolver);
+
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
@@ -35,8 +42,9 @@ public class SecurityConfig {
                 // so a malicious site cannot forge authenticated requests on behalf of the user.
                 .csrf(csrf -> csrf.disable())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(
-                        jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
-                ))
+                        jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                                .authenticationEntryPoint(authenticationEntryPoint)
+                                .accessDeniedHandler(accessDeniedHandler))
                 .build();
     }
 
