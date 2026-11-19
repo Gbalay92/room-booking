@@ -1,0 +1,49 @@
+### 1. Crear sala válida
+POST http://localhost:8080/api/rooms
+Content-Type: application/json
+
+{ "name": "Sala Azul", "capacity": 8 }
+
+### 2. Listar salas
+GET http://localhost:8080/api/rooms
+
+### 3. Obtener una sala (pega el id de la respuesta 1)
+GET http://localhost:8080/api/rooms
+
+### 4. Nombre vacío
+POST http://localhost:8080/api/rooms
+Content-Type: application/json
+
+{ "name": "", "capacity": 8 }
+
+### 5. Sin capacidad
+POST http://localhost:8080/api/rooms
+Content-Type: application/json
+
+{ "name": "Sala Roja" }
+
+### 6. Capacidad por encima del máximo (en dev es 50)
+POST http://localhost:8090/api/rooms
+Content-Type: application/json
+
+{ "name": "Auditorio", "capacity": 60 }
+
+### 7. Sala que no existe
+GET http://localhost:8080/api/rooms/00000000-0000-0000-0000-000000000000
+
+### 8. Id con formato inválido
+GET http://localhost:8080/api/rooms/abc
+
+### 9. Borrar (pega el id de la 1) y repetir el borrado
+DELETE http://localhost:8080/api/rooms/174294af-b9d7-416b-836f-d900e87cb6c6
+
+### 10. Actualizar sala
+PUT http://localhost:8080/api/rooms/183af4a4-12a6-4f51-b971-de812aa6f324
+Content-Type: application/json
+
+{ "name": "Sala Azul Renovada", "capacity": 12 }
+
+
+### 8. Obtener reservas
+GET http://localhost:8090/api/bookings?page=-1&size=500
+

@@ -11,6 +11,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -25,7 +26,7 @@ import static org.mockito.BDDMockito.then;
 
 @WebMvcTest(RoomController.class)
 @Import(SecurityConfig.class)
-@WithMockUser
+@WithMockUser(roles = "ADMIN")
 public class RoomControllerTests {
 
     @Autowired
@@ -33,6 +34,9 @@ public class RoomControllerTests {
 
     @MockitoBean
     private RoomService roomService;
+
+    @MockitoBean
+    private JwtDecoder jwtDecoder;
 
     @Test
     void returns404WhenRoomDoesNotExist() {
@@ -122,4 +126,16 @@ public class RoomControllerTests {
                 .hasStatus(HttpStatus.UNAUTHORIZED);
         then(roomService).shouldHaveNoInteractions();
     }
+    
+    @Test
+    @WithMockUser   // plain USER
+    void returns403WhenUserTriesToCreateRoom() {
+        assertThat(mvc.post().uri("/api/rooms").contentType(MediaType.APPLICATION_JSON)
+                .content("""
+            { "name": "Test Room", "capacity": 8 }
+            """))
+                .hasStatus(HttpStatus.FORBIDDEN);
+        then(roomService).shouldHaveNoInteractions();
+    }
+
 }

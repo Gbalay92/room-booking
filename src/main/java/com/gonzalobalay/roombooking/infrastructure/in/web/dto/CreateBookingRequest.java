@@ -7,6 +7,5 @@ import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.util.UUID;
 
-public record CreateBookingRequest(@NotNull UUID roomId,@NotNull Instant startsAt, @NotNull Instant endsAt,
-                                   @NotBlank @Size(max = 50) String userName) {
+public record CreateBookingRequest(@NotNull UUID roomId,@NotNull Instant startsAt, @NotNull Instant endsAt) {
 }

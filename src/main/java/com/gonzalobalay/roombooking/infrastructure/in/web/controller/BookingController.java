@@ -9,7 +9,9 @@ import com.gonzalobalay.roombooking.infrastructure.in.web.dto.CreateBookingReque
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -44,13 +46,19 @@ public class BookingController {
     }
 
     @PostMapping
-    public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody CreateBookingRequest bookingRequest) {
-        BookingSummary bookingSummary = retryingBookingService.createBooking(bookingRequest.roomId(), bookingRequest.startsAt(), bookingRequest.endsAt(), bookingRequest.userName());
+    public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody CreateBookingRequest bookingRequest, Authentication authentication) {
+        BookingSummary bookingSummary = retryingBookingService.createBooking(bookingRequest.roomId(), bookingRequest.startsAt(), bookingRequest.endsAt(), authentication.getName());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(bookingSummary.id())
                 .toUri();
 
         return ResponseEntity.created(location).body(BookingResponse.from(bookingSummary));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancelBooking(@PathVariable UUID id) {
+        bookingService.cancelBooking(id);
     }
 }

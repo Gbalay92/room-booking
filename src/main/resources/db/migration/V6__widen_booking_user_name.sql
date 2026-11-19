@@ -1,0 +1,1 @@
+ALTER TABLE booking ALTER COLUMN user_name TYPE VARCHAR(254);
