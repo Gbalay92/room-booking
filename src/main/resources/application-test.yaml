@@ -6,8 +6,3 @@ logging:
     com.gonzalobalay: INFO
 booking:
   max-room-capacity: 10
-spring:
-  docker:
-    compose:
-      skip:
-        in-tests: false

@@ -7,6 +7,7 @@ import com.gonzalobalay.roombooking.domain.exception.BookingOverlapException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
@@ -20,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
 public class BookingConcurrencyTests {
 

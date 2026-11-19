@@ -1,5 +1,6 @@
 package com.gonzalobalay.roombooking.infrastructure.out.persistence;
 
+import com.gonzalobalay.roombooking.TestcontainersConfiguration;
 import com.gonzalobalay.roombooking.application.port.AvailableRoom;
 import com.gonzalobalay.roombooking.application.service.BookingService;
 import com.gonzalobalay.roombooking.application.service.RoomService;
@@ -7,6 +8,7 @@ import com.gonzalobalay.roombooking.domain.Room;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
 @Transactional
 class AvailableRoomsQueryTests {
