@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 public class JwtTokenService {
 
-    private static final String ISSUER = "room-booking";
+    public static final String ISSUER = "room-booking";
     private static final Duration TOKEN_TTL = Duration.ofMinutes(15);
 
     private final JwtEncoder jwtEncoder;
