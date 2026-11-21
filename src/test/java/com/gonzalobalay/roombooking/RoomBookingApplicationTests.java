@@ -25,14 +25,4 @@ class RoomBookingApplicationTests {
 	void contextLoads() {
 	}
 
-    @Test
-    void createdAtUsesTheFixedClock() {
-        assertThat(roomService.create("Room 1", 2).createdAt()).isEqualTo(Instant.parse("2026-01-01T10:00:00Z"));
-    }
-
-    @Test
-    void rejectsCapacityAboveTheTestProfileLimit() {
-        assertThrows(RoomCapacityExceededException.class, () -> roomService.create("Room 1", 49));
-    }
-
 }

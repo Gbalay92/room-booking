@@ -1,5 +1,7 @@
 package com.gonzalobalay.roombooking.domain;
 
+import com.gonzalobalay.roombooking.domain.exception.InvalidTimeRangeException;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -19,7 +21,7 @@ public record Booking(UUID id, UUID roomId, Instant startsAt, Instant endsAt, St
             throw new IllegalArgumentException("Booking endsAt cannot be null");
         }
         if (!endsAt.isAfter(startsAt)) {
-            throw new IllegalArgumentException("Booking startsAt must be before endsAt");
+            throw new InvalidTimeRangeException(startsAt, endsAt);
         }
         if (userName == null || userName.isBlank()) {
             throw new IllegalArgumentException("Booking userName cannot be blank");
