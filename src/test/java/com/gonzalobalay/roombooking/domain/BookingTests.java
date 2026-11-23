@@ -36,6 +36,18 @@ class BookingTests {
                 .isInstanceOf(InvalidTimeRangeException.class);
     }
 
+    @Test
+    void rejectsMissingRequiredFields() {
+        assertThatThrownBy(() -> new Booking(null, ROOM_ID, TEN, ELEVEN, "alice@test"))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Booking(ID, null, TEN, ELEVEN, "alice@test"))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Booking(ID, ROOM_ID, null, ELEVEN, "alice@test"))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Booking(ID, ROOM_ID, TEN, null, "alice@test"))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = "   ")

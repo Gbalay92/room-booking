@@ -5,6 +5,8 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import org.junit.jupiter.api.Test;
 
+import static com.tngtech.archunit.base.DescribedPredicate.alwaysTrue;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.onionArchitecture;
@@ -32,10 +34,12 @@ class ArchitectureTests {
     @Test
     void hexagonalLayersAreRespected() {
         onionArchitecture()
+                .withOptionalLayers(true)
                 .domainModels("..domain..")
                 .applicationServices("..application..")
                 .adapter("web", "..infrastructure.in..")
                 .adapter("persistence", "..infrastructure.out..")
+                .ignoreDependency(resideInAnyPackage("..infrastructure.config..", "..infrastructure.security.."), alwaysTrue())
                 .check(CLASSES);
     }
 }

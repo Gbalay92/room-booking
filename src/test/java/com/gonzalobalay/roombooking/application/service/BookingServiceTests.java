@@ -5,6 +5,7 @@ import com.gonzalobalay.roombooking.application.port.BookingSummary;
 import com.gonzalobalay.roombooking.application.port.RoomRepository;
 import com.gonzalobalay.roombooking.domain.Booking;
 import com.gonzalobalay.roombooking.domain.Room;
+import com.gonzalobalay.roombooking.domain.exception.BookingNotFoundException;
 import com.gonzalobalay.roombooking.domain.exception.BookingOverlapException;
 import com.gonzalobalay.roombooking.domain.exception.RoomNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -66,5 +67,44 @@ class BookingServiceTests {
         assertThatThrownBy(() -> bookingService.createBookingOnce(ROOM_ID, TEN, ELEVEN, "alice@test"))
                 .isInstanceOf(RoomNotFoundException.class);
         verifyNoInteractions(bookingRepository);
+    }
+
+    @Test
+    void cancelsBooking() {
+        UUID bookingId = UUID.randomUUID();
+        Booking booking = new Booking(bookingId, ROOM_ID, TEN, ELEVEN, "alice@test");
+        when(bookingRepository.findById(bookingId)).thenReturn(Optional.of(booking));
+
+        bookingService.cancelBooking(bookingId);
+
+        verify(bookingRepository).deleteById(bookingId);
+    }
+
+    @Test
+    void rejectsCancellingABookingThatDoesNotExist() {
+        UUID id = UUID.randomUUID();
+        when(bookingRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookingService.cancelBooking(id))
+                .isInstanceOf(BookingNotFoundException.class);
+        verify(bookingRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void findByIdFailsWhenBookingDoesNotExist() {
+        UUID id = UUID.randomUUID();
+        when(bookingRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookingService.findById(id))
+                .isInstanceOf(BookingNotFoundException.class);
+    }
+
+    @Test
+    void findSummaryByIdFailsWhenBookingDoesNotExist() {
+        UUID id = UUID.randomUUID();
+        when(bookingRepository.findSummaryById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookingService.findSummaryById(id))
+                .isInstanceOf(BookingNotFoundException.class);
     }
 }

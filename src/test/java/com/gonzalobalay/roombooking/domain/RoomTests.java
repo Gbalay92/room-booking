@@ -26,6 +26,14 @@ class RoomTests {
     }
 
     @Test
+    void rejectsMissingIdOrCreationDate() {
+        assertThatThrownBy(() -> new Room(null, "Room A", 4, CREATED_AT, null))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new Room(ID, "Room A", 4, null, null))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void withDetailsKeepsIdentityAndCreationDate() {
         Room updated = new Room(ID, "Room A", 4, CREATED_AT, 0L).withDetails("Room B", 8, 1L);
 
