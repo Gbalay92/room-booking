@@ -64,7 +64,49 @@ Requirements: **JDK 25** and **Docker**.
 - In the `dev` profile, `DevUserSeeder` creates one `ADMIN` and one `USER` account for local testing. Their
   credentials are defined in that class.
 
-The API listens on `http://localhost:8080`.
+In the `dev` profile the API listens on `http://localhost:8090`.
+
+### Docker image
+
+```bash
+docker build -t room-booking .
+```
+
+The multi-stage `Dockerfile` works in three steps:
+
+1. **Build.** Maven builds the jar in a JDK image. Dependencies are resolved in their own layer (`dependency:go-offline`)
+   before the source code is copied in.
+2. **Extract.** The jar is split into Spring Boot layers (`-Djarmode=tools extract --layers`).
+3. **Runtime.** Those layers are copied into a JRE-only image that runs as a non-root user.
+
+The final image has no JDK, Maven, source code or secrets.
+
+- **Layering.** A code change only rebuilds the `application` layer (~85 KB). The 61 MB `dependencies` layer is reused.
+  This made rebuilds about 4× faster and keeps pushes and pulls small.
+- **Memory.** The heap is sized from the container's memory limit with `-XX:MaxRAMPercentage=75`. A fixed `-Xmx`
+  would have to be changed every time the limit changes. JVM flags can be overridden at runtime through
+  `JAVA_TOOL_OPTIONS`.
+
+#### Why a Dockerfile and not Buildpacks
+
+`./mvnw spring-boot:build-image` (Paketo Buildpacks) was evaluated as an alternative. Both images were run with a
+512 MB limit:
+
+| | Dockerfile | Buildpacks |
+|---|---|---|
+| Image size | 397 MB | 382 MB |
+| Startup | ~12.5 s | ~11.5 s |
+| Max heap | 384 MB (75% of the limit) | 91 MB (computed `-Xmx`) |
+| Shell in the image | yes (Ubuntu base) | no |
+| Starts with defaults | yes | no: the memory calculator reserves 250 threads + 240 MB code cache, so it needs `BPL_JVM_THREAD_COUNT` tuned |
+
+Size and startup time are about the same. The Dockerfile wins on control and transparency:
+
+- every layer and JVM flag is explicit;
+- the image can be debugged with a shell;
+- it behaves predictably under small memory limits.
+
+Buildpacks would be the better choice to avoid maintaining a Dockerfile across many services.
 
 ## Authentication
 

@@ -1,0 +1,10 @@
+.git/
+.idea/
+.mvn/
+target/
+mvnw
+mvnw.cmd
+*.md
+request.http
+compose.yaml
+.env
