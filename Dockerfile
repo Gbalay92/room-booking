@@ -9,13 +9,13 @@ COPY src ./src
 RUN mvn -B -q package -DskipTests            # tests run in CI, not in the image build
 
 # ---- extract Spring Boot layers ----
-FROM eclipse-temurin:21-jre AS extract
+FROM eclipse-temurin:25-jre AS extract
 WORKDIR /extract
 COPY --from=build /workspace/target/room-booking-*.jar application.jar
 RUN java -Djarmode=tools -jar application.jar extract --layers --destination extracted
 
 # ---- runtime: JRE only, non-root ----
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 RUN groupadd --system spring && useradd --system --gid spring --no-create-home spring
 WORKDIR /app
 COPY --from=extract /extract/extracted/dependencies/ ./
