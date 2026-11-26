@@ -7,8 +7,11 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
 server:
   port: 8080
+  shutdown: graceful
 management:
   endpoints:
     web:

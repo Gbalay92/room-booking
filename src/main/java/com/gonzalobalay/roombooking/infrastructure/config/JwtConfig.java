@@ -4,14 +4,17 @@ import com.gonzalobalay.roombooking.infrastructure.security.JwtTokenService;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Clock;
 
@@ -19,6 +22,7 @@ import java.time.Clock;
 class JwtConfig {
 
     @Bean
+    @Profile("!prod")
     KeyPair jwtKeyPair() {
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
@@ -27,6 +31,13 @@ class JwtConfig {
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("RSA not available", e);
         }
+    }
+
+    @Bean
+    @Profile("prod")
+    KeyPair jwtKeyPairFromPem(@Value("${jwt.public-key}") RSAPublicKey publicKey,
+                              @Value("${jwt.private-key}") RSAPrivateKey privateKey) {
+        return new KeyPair(publicKey, privateKey);
     }
 
     @Bean

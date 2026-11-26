@@ -24,5 +24,6 @@ COPY --from=extract /extract/extracted/snapshot-dependencies/ ./
 COPY --from=extract /extract/extracted/application/ ./
 USER spring
 ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75"
+ENV SPRING_PROFILES_ACTIVE=prod
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "application.jar"]

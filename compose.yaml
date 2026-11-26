@@ -1,9 +1,55 @@
+name: room-booking
+
 services:
-  postgres:
+  db:
     image: postgres:17
     environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: roombooking
+      POSTGRES_USER: ${DB_USERNAME:?set DB_USERNAME in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    # no ports: the DB is only reachable from the app, over the compose network
+
+  app:
+    build: .
+    image: room-booking:local
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/roombooking
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_PUBLIC_KEY: file:/run/secrets/jwt-public.pem
+      JWT_PRIVATE_KEY: file:/run/secrets/jwt-private.pem
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    secrets:
+      - jwt-public.pem
+      - jwt-private.pem
     ports:
-      - '5432'
+      - "${APP_PORT:-8081}:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-fsS", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 40s
+    stop_grace_period: 30s      # > timeout-per-shutdown-phase (20s), or Docker SIGKILLs mid-drain
+    mem_limit: 512m
+    restart: unless-stopped
+
+secrets:
+  jwt-public.pem:
+    file: ./secrets/jwt-public.pem
+  jwt-private.pem:
+    file: ./secrets/jwt-private.pem
+
+volumes:
+  db-data:
