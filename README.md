@@ -1,5 +1,8 @@
 # Room Booking API
 
+[![CI](https://github.com/Gbalay92/room-booking/actions/workflows/ci.yml/badge.svg)](https://github.com/Gbalay92/room-booking/actions/workflows/ci.yml)
+![Coverage](https://raw.githubusercontent.com/Gbalay92/room-booking/badges/jacoco.svg)
+
 A REST API for booking meeting rooms. Users authenticate with a JWT, list rooms, check availability and book time
 slots; admins manage rooms and see every booking. The core guarantee is that **a room can never be double-booked**,
 even under concurrent requests. That guarantee is enforced in the database and covered by tests against a real
