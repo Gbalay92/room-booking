@@ -53,6 +53,43 @@ Room updates use optimistic locking (`@Version`). Sending a stale `version` retu
 
 ## Getting started
 
+### Run the full stack with Docker Compose
+
+Requirements: **Docker** with Compose v2 and **OpenSSL**. No JDK needed.
+
+```bash
+cp .env.example .env            # then change every value in .env
+
+mkdir -p secrets
+openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out secrets/jwt-private.pem
+openssl pkey -in secrets/jwt-private.pem -pubout -out secrets/jwt-public.pem
+chmod 644 secrets/*.pem         # the app runs as a non-root user inside the container
+
+docker compose up -d --build --wait
+```
+
+The API listens on `http://localhost:8081` (`APP_PORT` in `.env`). Log in with the `ADMIN_EMAIL` /
+`ADMIN_PASSWORD` from `.env` (see [Authentication](#authentication)).
+
+What `compose.yaml` does:
+
+- **Startup order.** The app starts only once PostgreSQL passes its `pg_isready` healthcheck. The app has its own
+  healthcheck on `/actuator/health`, so `--wait` returns when the API is ready.
+- **`prod` profile.** The image defaults to `SPRING_PROFILES_ACTIVE=prod`. Every sensitive value comes from the
+  environment, and a missing one stops the startup instead of falling back to a default. Compose also refuses to
+  start without `DB_USERNAME` / `DB_PASSWORD`.
+- **Secrets.** `.env` and `secrets/` are gitignored. The RSA keys are mounted as files under `/run/secrets/`, not
+  passed as environment variables, so they don't show up in `docker inspect`. Because the keys are stable, tokens
+  stay valid across restarts.
+- **Initial admin.** In `prod`, `InitialAdminSeeder` creates the admin from `ADMIN_EMAIL` / `ADMIN_PASSWORD` if it
+  doesn't exist yet. It's safe to run on every restart.
+- **Network.** The database publishes no port. Only the app can reach it, over the Compose network. Data is kept in
+  the `db-data` volume (`docker compose down -v` removes it).
+- **Graceful shutdown.** On `docker compose stop`, in-flight requests are allowed to finish (up to 20 s) and new ones
+  are refused. `stop_grace_period` is 30 s, so Docker never kills the JVM before Spring is done.
+
+### Run locally for development
+
 Requirements: **JDK 25** and **Docker**.
 
 ```bash
@@ -60,11 +97,22 @@ Requirements: **JDK 25** and **Docker**.
 ```
 
 - The `dev` profile is active by default.
-- Spring Boot's Docker Compose support starts PostgreSQL from `compose.yaml`, and Flyway creates the schema.
+- Spring Boot's Docker Compose support starts PostgreSQL from `compose.dev.yaml`, and Flyway creates the schema.
 - In the `dev` profile, `DevUserSeeder` creates one `ADMIN` and one `USER` account for local testing. Their
   credentials are defined in that class.
+- The RSA key pair is generated in memory, so tokens stop working after a restart.
 
 In the `dev` profile the API listens on `http://localhost:8090`.
+
+#### Configuration
+
+| Variable | Used by | Purpose |
+|---|---|---|
+| `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` | `prod` | PostgreSQL connection (Compose sets `DB_URL` itself) |
+| `JWT_PUBLIC_KEY`, `JWT_PRIVATE_KEY` | `prod` | PEM key locations, e.g. `file:/run/secrets/jwt-private.pem`. The private key must be PKCS#8 |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | `prod` | Initial admin account (optional) |
+| `APP_PORT` | Compose | Host port for the API (default `8081`) |
+| `JAVA_TOOL_OPTIONS` | image | JVM flags (default `-XX:MaxRAMPercentage=75`) |
 
 ### Docker image
 
@@ -113,7 +161,7 @@ Buildpacks would be the better choice to avoid maintaining a Dockerfile across m
 Exchange credentials for a token:
 
 ```bash
-curl -X POST http://localhost:8080/auth/token \
+curl -X POST http://localhost:8081/auth/token \
   -H "Content-Type: application/json" \
   -d '{"email": "<email>", "password": "<password>"}'
 ```
@@ -122,7 +170,8 @@ curl -X POST http://localhost:8080/auth/token \
 { "access_token": "eyJ...", "token_type": "Bearer", "expires_in": 900 }
 ```
 
-Send it on every request as `Authorization: Bearer <token>`.
+Send it on every request as `Authorization: Bearer <token>`. The examples use the Compose port (`8081`). In the
+`dev` profile, use `8090`.
 
 - Tokens are signed with RS256, issued by `room-booking` and valid for 15 minutes.
 - The `sub` claim is the user's email. It becomes the owner of the bookings that user creates.
@@ -196,9 +245,9 @@ matters.
 
 ## Known limitations
 
-- **The RSA key pair is generated in memory at startup.** Issued tokens stop working after a restart, and multiple
-  instances can't share them. Production would load the key from a secret store or delegate to an identity provider
-  (e.g. Keycloak).
+- **The JWT signing keys are files managed by hand.** In `prod` they are loaded from PEM files, so tokens survive
+  restarts and instances can share them. There is no key rotation, though. A real deployment would keep the keys in
+  a secret store (e.g. AWS Secrets Manager) or delegate to an identity provider (e.g. Keycloak).
 - **JWTs can't be revoked before they expire.** There is no denylist and no refresh tokens. The short TTL (15 min)
   limits the impact.
 - **No rate limiting on `/auth/token`.**

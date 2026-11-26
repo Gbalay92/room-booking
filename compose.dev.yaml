@@ -1,3 +1,4 @@
+name: room-booking-dev
 services:
   postgres:
     image: postgres:17
