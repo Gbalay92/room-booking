@@ -10,7 +10,7 @@ PostgreSQL.
 
 ## Tech stack
 
-- Java 25, Spring Boot 4.1
+- Java 21 (LTS), Spring Boot 4.1
 - Spring Security 7 (OAuth2 Resource Server, RS256 JWT)
 - Hibernate 7 / Spring Data JPA, PostgreSQL 17, Flyway
 - JUnit 6, Mockito, Testcontainers, ArchUnit, JaCoCo
@@ -93,7 +93,8 @@ What `compose.yaml` does:
 
 ### Run locally for development
 
-Requirements: **JDK 25** and **Docker**.
+Requirements: **JDK 21 or newer** and **Docker**. The build targets Java 21 (`--release 21`), the same version used
+by CI and the Docker image.
 
 ```bash
 ./mvnw spring-boot:run
