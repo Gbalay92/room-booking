@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---- build: JDK + Maven ----
-FROM maven:3.9-eclipse-temurin-21 AS build
+FROM maven:3.9-eclipse-temurin-26 AS build
 WORKDIR /workspace
 COPY pom.xml .
 RUN mvn -B -q dependency:go-offline          # dependency layer: only re-run when pom.xml changes
