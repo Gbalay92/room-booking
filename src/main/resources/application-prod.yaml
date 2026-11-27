@@ -15,3 +15,8 @@ bootstrap:
   admin:
     email: ${ADMIN_EMAIL:}
     password: ${ADMIN_PASSWORD:}
+
+logging:
+  structured:
+    format:
+      console: ecs        # Elastic Common Schema; MDC entries (requestId) are included automatically
