@@ -30,13 +30,14 @@ services:
       JWT_PRIVATE_KEY: file:/run/secrets/jwt-private.pem
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      API_DOCS_ENABLED: ${API_DOCS_ENABLED:-false}
     secrets:
       - jwt-public.pem
       - jwt-private.pem
     ports:
       - "${APP_PORT:-8081}:8080"
     healthcheck:
-      test: [ "CMD", "curl", "-fsS", "http://localhost:8080/actuator/health" ]
+      test: [ "CMD", "curl", "-fsS", "http://localhost:8080/actuator/health/readiness" ]
       interval: 10s
       timeout: 3s
       retries: 5

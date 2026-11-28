@@ -20,3 +20,8 @@ logging:
   structured:
     format:
       console: ecs        # Elastic Common Schema; MDC entries (requestId) are included automatically
+springdoc:
+  api-docs:
+    enabled: ${API_DOCS_ENABLED:false}
+  swagger-ui:
+    enabled: ${API_DOCS_ENABLED:false}

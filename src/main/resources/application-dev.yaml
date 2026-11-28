@@ -16,3 +16,5 @@ spring:
   docker:
     compose:
       file: compose.dev.yaml
+  flyway:
+    locations: classpath:db/migration,classpath:db/demo
