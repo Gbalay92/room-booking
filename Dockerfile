@@ -22,6 +22,8 @@ COPY --from=extract /extract/extracted/dependencies/ ./
 COPY --from=extract /extract/extracted/spring-boot-loader/ ./
 COPY --from=extract /extract/extracted/snapshot-dependencies/ ./
 COPY --from=extract /extract/extracted/application/ ./
+ARG GIT_COMMIT=unknown
+ENV INFO_APP_COMMIT=${GIT_COMMIT}
 USER spring
 ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75"
 ENV SPRING_PROFILES_ACTIVE=prod

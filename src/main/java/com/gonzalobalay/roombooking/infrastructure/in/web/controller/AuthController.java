@@ -3,6 +3,7 @@ package com.gonzalobalay.roombooking.infrastructure.in.web.controller;
 import com.gonzalobalay.roombooking.infrastructure.in.web.dto.TokenRequest;
 import com.gonzalobalay.roombooking.infrastructure.in.web.dto.TokenResponse;
 import com.gonzalobalay.roombooking.infrastructure.security.JwtTokenService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/token")
+    @SecurityRequirements   // io.swagger.v3.oas.annotations.security.SecurityRequirements: empty = public
     public TokenResponse token(@Valid @RequestBody TokenRequest tokenRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken.unauthenticated(tokenRequest.email(), tokenRequest.password()));
